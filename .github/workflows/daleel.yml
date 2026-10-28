@@ -1,12 +1,9 @@
 name: Daleel tenders (hourly)
 
 on:
-  schedule:
-    - cron: "5 * * * *"          # every hour at :05 (UTC; GitHub may start it a few minutes late)
-  workflow_dispatch: {}            # "Run workflow" button for a manual run
-  push:                            # a code change starts a test run by itself
-    branches: [main]
-    paths: ["*.py", ".github/workflows/*.yml", "requirements.txt"]
+  # Hourly schedule OFF (28 Oct 2026): Daleel's Cloudflare protection blocks GitHub's servers (HTTP 403).
+  # Capture runs on the PC (Windows task "Valeo Daleel Tenders Hourly"). Manual test run only:
+  workflow_dispatch: {}
 
 permissions:
   contents: write                  # to save the tender history (daleel_madani_tenders.json) back to the repository
