@@ -97,7 +97,12 @@ def main():
     ts.save_tenders(records)
     ts.export_csv(records, CSV_PATH)
     send_file(CSV_PATH, os.path.basename(CSV_PATH), root=True, overwrite=True)
-    status = "OK" if not failed else "CHECK LOG"
+    log_path = os.path.join(OUT, "run.log")
+    log = open(log_path, encoding="utf-8", errors="replace").read() if os.path.exists(log_path) else ""
+    blocked = any(w in log for w in ("STOP:", "RUN INCOMPLETE", "Traceback", "Blocked"))
+    status = "OK" if not failed and not blocked else "CHECK LOG"
+    if log:   # the scraper's own output, newest run only, next to last_run.txt
+        send_file(log_path, "last_run_log.txt", root=True, overwrite=True)
     stamp = datetime.now().strftime("%Y-%m-%d_%H%M")
     lr = os.path.join(OUT, "last_run.txt")
     with open(lr, "w", encoding="utf-8") as f:

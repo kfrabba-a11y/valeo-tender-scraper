@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "5 * * * *"          # every hour at :05 (UTC; GitHub may start it a few minutes late)
   workflow_dispatch: {}            # "Run workflow" button for a manual run
+  push:                            # a code change starts a test run by itself
+    branches: [main]
+    paths: ["*.py", ".github/workflows/*.yml", "requirements.txt"]
 
 permissions:
   contents: write                  # to save the tender history (daleel_madani_tenders.json) back to the repository
@@ -37,10 +40,11 @@ jobs:
           pip install -q -r requirements.txt
           google-chrome --version
       - name: Listings
-        run: xvfb-run -a python tender_scraper.py
+        run: mkdir -p out && xvfb-run -a python tender_scraper.py 2>&1 | tee out/run.log
       - name: Documents
-        run: xvfb-run -a python tender_documents.py
+        run: xvfb-run -a python tender_documents.py 2>&1 | tee -a out/run.log
       - name: Upload to Drive (through the bot)
+        if: always()
         run: python cloud_upload.py
       - name: Save history
         if: always()
