@@ -1,0 +1,51 @@
+name: Daleel tenders (hourly)
+
+on:
+  schedule:
+    - cron: "5 * * * *"          # every hour at :05 (UTC; GitHub may start it a few minutes late)
+  workflow_dispatch: {}            # "Run workflow" button for a manual run
+
+permissions:
+  contents: write                  # to save the tender history (daleel_madani_tenders.json) back to the repository
+
+concurrency:
+  group: daleel
+  cancel-in-progress: false        # a long run is never cut; the next one waits
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      DALEEL_CLOUD: "1"
+      DALEEL_OUT: out
+      DALEEL_CSV: out/daleel_madani_tenders.csv
+      DALEEL_DOCS: out/Available Tenders
+      DALEEL_ONLY_RELEVANT: "0"
+      PYTHONIOENCODING: utf-8
+      PYTHONUNBUFFERED: "1"
+      BOT_URL: ${{ secrets.BOT_URL }}
+      SCRAPER_KEY: ${{ secrets.SCRAPER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb > /dev/null
+          pip install -q -r requirements.txt
+          google-chrome --version
+      - name: Listings
+        run: xvfb-run -a python tender_scraper.py
+      - name: Documents
+        run: xvfb-run -a python tender_documents.py
+      - name: Upload to Drive (through the bot)
+        run: python cloud_upload.py
+      - name: Save history
+        if: always()
+        run: |
+          git config user.name "tender-bot"
+          git config user.email "tender-bot@users.noreply.github.com"
+          git add daleel_madani_tenders.json
+          git diff --cached --quiet || (git commit -q -m "history $(date -u +%F_%H%M)" && git push -q)
