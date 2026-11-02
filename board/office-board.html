@@ -1,0 +1,298 @@
+<title>Valeo Tender Office</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a site-office wall. "Waiting for you" pinned at the top, then the crew, the tender pipeline, and the day's log. */
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --ink:#18242c; --ink-2:#4d5d68; --line:#d5dde2;
+  --accent:#1d5f7d; --accent-ink:#ffffff;
+  --you:#f2c230; --you-ink:#2a2100; --you-wash:#fdf4d3;
+  --ok:#2f7d4f; --ok-wash:#e2f1e7; --warn:#a8650c; --warn-wash:#f8ecd9;
+  --bad:#b23a32; --bad-wash:#f8e1df; --info:#4b5fa6; --info-wash:#e5e8f6; --muted:#7a8891; --muted-wash:#e8ecee;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121a1f; --panel:#1a252c; --ink:#e4ebef; --ink-2:#9fb0ba; --line:#2c3a43;
+  --accent:#5fb0d4; --accent-ink:#0c1a21;
+  --you:#f2c230; --you-ink:#2a2100; --you-wash:#3a3110;
+  --ok:#6cc391; --ok-wash:#173327; --warn:#e3a24a; --warn-wash:#3a2a12; --bad:#ef7d74; --bad-wash:#3d1d1b; --info:#98a8ec; --info-wash:#222b4a; --muted:#8d9ba4; --muted-wash:#24313a;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#121a1f; --panel:#1a252c; --ink:#e4ebef; --ink-2:#9fb0ba; --line:#2c3a43;
+  --accent:#5fb0d4; --accent-ink:#0c1a21;
+  --you:#f2c230; --you-ink:#2a2100; --you-wash:#3a3110;
+  --ok:#6cc391; --ok-wash:#173327; --warn:#e3a24a; --warn-wash:#3a2a12; --bad:#ef7d74; --bad-wash:#3d1d1b; --info:#98a8ec; --info-wash:#222b4a; --muted:#8d9ba4; --muted-wash:#24313a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;margin:0;text-wrap:balance}
+h1{font-size:clamp(26px,4vw,34px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:19px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+h2 .count{font-family:var(--f-mono);font-size:13px;font-weight:500;color:var(--ink-2)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2);font-weight:600}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+header .meta{display:flex;gap:16px;flex-wrap:wrap;align-items:center;color:var(--ink-2);font-size:13px}
+.conn{display:inline-flex;align-items:center;gap:6px}
+.conn i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.conn[data-s="live"] i{background:var(--ok)}
+.conn[data-s="slow"] i{background:var(--warn)}
+.conn[data-s="off"] i{background:var(--bad)}
+section{display:grid;gap:12px;min-width:0}
+
+/* Waiting for you */
+.you{background:var(--you-wash);border:2px solid var(--you);border-radius:6px;padding:16px;display:grid;gap:12px}
+.you h2::before{content:"";width:12px;height:12px;background:var(--you);border-radius:2px;align-self:center}
+.needs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.need{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:8px;min-width:0}
+.need h3{font-size:17px;font-weight:700}
+.need .detail{color:var(--ink-2);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.need .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
+.need a{color:var(--accent);overflow-wrap:anywhere}
+.need textarea{width:100%;min-height:54px;resize:vertical;font:inherit;font-size:14px;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:600 14px var(--f-body);padding:8px 14px;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.approve{background:var(--ok);border-color:var(--ok);color:#fff}
+button.decline{color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.55;cursor:default}
+.empty{color:var(--ink-2);font-size:14px;padding:6px 0}
+details.decided summary{cursor:pointer;font-size:13px;color:var(--ink-2)}
+details.decided ul{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:13px}
+
+/* Team */
+.team{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.member{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:6px;padding:12px 14px;display:grid;gap:6px;min-width:0}
+.member[data-tone="ok"]{border-left-color:var(--ok)} .member[data-tone="you"]{border-left-color:var(--you)}
+.member[data-tone="warn"]{border-left-color:var(--warn)} .member[data-tone="bad"]{border-left-color:var(--bad)} .member[data-tone="info"]{border-left-color:var(--info)}
+.member .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.member .name{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:17px;line-height:1.2}
+.member .role{font-size:12px;color:var(--ink-2)}
+.member .task{font-size:14px;overflow-wrap:anywhere}
+.member .note{font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--muted-wash);color:var(--muted)}
+.pill[data-tone="ok"]{background:var(--ok-wash);color:var(--ok)} .pill[data-tone="you"]{background:var(--you);color:var(--you-ink)}
+.pill[data-tone="warn"]{background:var(--warn-wash);color:var(--warn)} .pill[data-tone="bad"]{background:var(--bad-wash);color:var(--bad)} .pill[data-tone="info"]{background:var(--info-wash);color:var(--info)}
+.lvl{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;color:var(--ink-2)}
+.bar{height:5px;background:var(--muted-wash);border-radius:3px;overflow:hidden}
+.bar b{display:block;height:100%;background:var(--accent)}
+
+/* Pipeline */
+.pipe-scroll{overflow-x:auto;padding-bottom:4px}
+.pipe{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px;min-width:980px}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;display:grid;gap:8px;align-content:start;min-width:0}
+.col h3{font-size:14px;font-weight:700;display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
+.col[data-stage="awaiting"] h3{color:var(--warn)} .col[data-stage="blocked"] h3{color:var(--bad)} .col[data-stage="done"] h3{color:var(--ok)}
+.card{border:1px solid var(--line);border-radius:4px;padding:8px 10px;display:grid;gap:4px;background:var(--bg);min-width:0}
+.card .t{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.card .m{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:12px;color:var(--ink-2)}
+.due-soon{color:var(--bad);font-weight:600}
+
+/* Log */
+.log{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.log ol{list-style:none;margin:0;padding:0}
+.log li{display:grid;grid-template-columns:86px 110px 1fr;gap:10px;padding:8px 12px;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
+.log li:first-child{border-top:0}
+.log .when{font-size:12px;color:var(--ink-2)}
+.log .who{font-weight:600;font-size:13px}
+.log .what{overflow-wrap:anywhere;min-width:0}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-right:6px;color:var(--ink-2)}
+.tag[data-k="report"]{color:var(--accent)} .tag[data-k="stuck"]{color:var(--bad)} .tag[data-k="decision"]{color:var(--ok)} .tag[data-k="need"]{color:var(--warn)}
+@media (max-width:560px){.log li{grid-template-columns:1fr;gap:2px}}
+.banner{font-size:13px;padding:8px 12px;border-radius:4px;background:var(--warn-wash);color:var(--warn)}
+@media (prefers-reduced-motion:no-preference){.member,.need,.card{transition:border-color .2s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Valeo · Tender office</div>
+      <h1>Office board</h1>
+    </div>
+    <div class="meta">
+      <span id="today" class="mono"></span>
+      <span class="conn" id="conn" data-s="wait"><i></i><span id="connText">Connecting…</span></span>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section class="you" aria-labelledby="h-you">
+    <h2 id="h-you">Waiting for you <span class="count mono" id="needCount"></span></h2>
+    <div class="needs" id="needs"><p class="empty">Loading what needs your decision…</p></div>
+    <details class="decided" id="decidedBox" hidden>
+      <summary>Recently decided</summary>
+      <ul id="decided"></ul>
+    </details>
+  </section>
+
+  <section aria-labelledby="h-team">
+    <h2 id="h-team">The team <span class="count mono" id="teamCount"></span></h2>
+    <div class="team" id="team"><p class="empty">Loading the team…</p></div>
+  </section>
+
+  <section aria-labelledby="h-pipe">
+    <h2 id="h-pipe">Tender pipeline <span class="count mono" id="taskCount"></span></h2>
+    <div class="pipe-scroll"><div class="pipe" id="pipe"></div></div>
+  </section>
+
+  <section aria-labelledby="h-log">
+    <h2 id="h-log">Activity</h2>
+    <div class="log"><ol id="log"><li><span></span><span></span><span class="empty">Reports, starts, stalls and your decisions show up here.</span></li></ol></div>
+  </section>
+</div>
+
+<script>
+const TZ = "Asia/Beirut";
+const STATUS = {
+  working:{label:"Working",tone:"ok"}, idle:{label:"Free",tone:"muted"},
+  waiting_owner:{label:"Waiting for you",tone:"you"}, waiting_dept:{label:"Waiting on a dept",tone:"warn"},
+  stuck:{label:"Stuck",tone:"bad"}, meeting:{label:"In a meeting",tone:"info"}, learning:{label:"Learning",tone:"info"}
+};
+const STAGES = [["ready","Ready"],["working","In progress"],["awaiting","Awaiting you"],["blocked","Blocked"],["done","Done"]];
+const LEVELS = [[1,"Trainee",0],[2,"Junior",50],[3,"Assistant",120],[4,"Specialist",220],[5,"Senior",350],[6,"Lead",520],[7,"Expert",740],[8,"Head",1000],[9,"Master",1300],[10,"Legend",1700]];
+const state = {staff:[], tasks:[], needs:[], events:[], names:{owner:"You"}};
+let db = null, canWrite = true;
+
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+function fmtTime(iso){ if(!iso) return ""; const d = new Date(iso); if (isNaN(d)) return "";
+  const now = new Date(); const day = d.toLocaleDateString("en-GB",{timeZone:TZ}); const today = now.toLocaleDateString("en-GB",{timeZone:TZ});
+  const t = d.toLocaleTimeString("en-US",{timeZone:TZ,hour:"numeric",minute:"2-digit",hour12:true});
+  return day === today ? t : d.toLocaleDateString("en-GB",{timeZone:TZ,day:"numeric",month:"short"}) + " " + t; }
+function fmtDate(iso){ if(!iso) return ""; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleDateString("en-GB",{timeZone:TZ,day:"numeric",month:"short"}); }
+function who(id){ return state.names[id] || id || "—"; }
+$("today").textContent = new Date().toLocaleDateString("en-GB",{timeZone:TZ,weekday:"long",day:"numeric",month:"long"});
+
+function levelInfo(xp){ xp = Number(xp)||0; let cur = LEVELS[0];
+  for (const L of LEVELS) if (xp >= L[2]) cur = L;
+  const next = LEVELS.find(L => L[2] > xp);
+  const pct = next ? Math.round(100*(xp-cur[2])/(next[2]-cur[2])) : 100;
+  return {n:cur[0], name:cur[1], pct, next: next ? next[2] : null}; }
+
+function renderTeam(){
+  const box = $("team"); box.replaceChildren();
+  const list = [...state.staff].sort((a,b)=>(a.order??99)-(b.order??99));
+  $("teamCount").textContent = list.length ? list.length : "";
+  if (!list.length){ box.append(el("p","empty","No staff yet. The CEO session adds one document per department to the staff collection.")); return; }
+  for (const s of list){
+    const st = STATUS[s.status] || STATUS.idle;
+    const c = el("article","member"); c.dataset.tone = st.tone;
+    const top = el("div","top"); const id = el("div");
+    id.append(el("div","name",s.name||s.id), el("div","role",s.role||""));
+    const p = el("span","pill",st.label); p.dataset.tone = st.tone;
+    top.append(id,p); c.append(top);
+    if (s.task) c.append(el("div","task",s.task));
+    if (s.note) c.append(el("div","note",s.note));
+    const L = levelInfo(s.xp);
+    const lv = el("div","lvl"); lv.append(el("span","mono","L"+L.n+" "+L.name));
+    const bar = el("div","bar"); const b = el("b"); b.style.width = L.pct+"%"; bar.append(b); lv.append(bar);
+    lv.append(el("span","mono",(Number(s.xp)||0)+(L.next?"/"+L.next:"")+" xp")); c.append(lv);
+    if (s.updated) c.append(el("div","note mono","Updated "+fmtTime(s.updated)));
+    box.append(c);
+  }
+}
+
+function renderPipe(){
+  const box = $("pipe"); box.replaceChildren();
+  const open = state.tasks.filter(t=>t.stage!=="done").length;
+  $("taskCount").textContent = state.tasks.length ? open+" open" : "";
+  const soon = Date.now() + 3*864e5;
+  for (const [key,label] of STAGES){
+    let items = state.tasks.filter(t => (t.stage||"ready") === key);
+    items.sort((a,b)=> String(a.deadline||"9999").localeCompare(String(b.deadline||"9999")));
+    if (key === "done") items = items.sort((a,b)=>String(b.updated||"").localeCompare(String(a.updated||""))).slice(0,8);
+    const col = el("div","col"); col.dataset.stage = key;
+    const h = el("h3"); h.append(el("span",null,label), el("span","mono",String(items.length))); col.append(h);
+    if (!items.length) col.append(el("p","empty",key==="ready"?"New tenders land here.":"Nothing here."));
+    for (const t of items){
+      const c = el("div","card"); c.append(el("div","t",t.title||t.id));
+      const m = el("div","m");
+      if (t.ref) m.append(el("span","mono",t.ref));
+      if (t.owner) m.append(el("span",null,who(t.owner)));
+      if (t.deadline){ const d = el("span","mono","Due "+fmtDate(t.deadline)); if (key!=="done" && new Date(t.deadline).getTime() < soon) d.classList.add("due-soon"); m.append(d); }
+      c.append(m); if (t.note) c.append(el("div","m",t.note));
+      col.append(c);
+    }
+    box.append(col);
+  }
+}
+
+function renderNeeds(){
+  const box = $("needs"); box.replaceChildren();
+  const open = state.needs.filter(n => (n.status||"open")==="open").sort((a,b)=>String(a.created||"").localeCompare(String(b.created||"")));
+  $("needCount").textContent = open.length ? String(open.length) : "";
+  if (!open.length) box.append(el("p","empty","Nothing is waiting for you. When a department needs a decision, it appears here."));
+  for (const n of open){
+    const c = el("article","need");
+    const row = el("div","row"); row.append(el("span",null,"From "+who(n.from)), el("span","mono",fmtTime(n.created)));
+    if (n.kind) row.append(el("span","pill",n.kind));
+    c.append(row, el("h3",null,n.title||n.id));
+    if (n.detail) c.append(el("div","detail",n.detail));
+    if (n.link){ const a = el("a",null,n.link); a.href = n.link; a.target="_blank"; a.rel="noopener"; c.append(a); }
+    if (canWrite){
+      const ta = el("textarea"); ta.id = "note-"+n.id; ta.placeholder = "Your note (optional). The department reads it word for word.";
+      ta.setAttribute("aria-label","Note for "+(n.title||n.id));
+      const acts = el("div","actions");
+      const ok = el("button","approve","Approve"); const no = el("button","decline","Decline");
+      ok.onclick = () => decide(n, "approved", ta, [ok,no]);
+      no.onclick = () => decide(n, "declined", ta, [ok,no]);
+      acts.append(ok,no); c.append(ta,acts);
+    }
+    box.append(c);
+  }
+  const done = state.needs.filter(n => n.status && n.status!=="open").sort((a,b)=>String(b.decidedAt||"").localeCompare(String(a.decidedAt||""))).slice(0,6);
+  $("decidedBox").hidden = !done.length;
+  const ul = $("decided"); ul.replaceChildren();
+  for (const n of done){ const li = el("li"); const t = el("span","tag",n.status); t.dataset.k = "decision";
+    li.append(t, document.createTextNode((n.title||n.id)+(n.answer?" — “"+n.answer+"”":"")+"  "), el("span","mono",fmtTime(n.decidedAt))); ul.append(li); }
+}
+
+function renderLog(){
+  const box = $("log"); if (!state.events.length) return;
+  box.replaceChildren();
+  for (const e of state.events){
+    const li = el("li"); li.append(el("span","when mono",fmtTime(e.at)), el("span","who",who(e.from)));
+    const w = el("span","what"); const t = el("span","tag",e.type||"note"); t.dataset.k = e.type||"note"; w.append(t, document.createTextNode(e.text||""));
+    li.append(w); box.append(li);
+  }
+}
+
+async function decide(n, status, ta, btns){
+  btns.forEach(b=>b.disabled=true);
+  const answer = ta.value.trim(); const at = new Date().toISOString();
+  try {
+    await db.doc("needs/"+n.id).update({status, answer, decidedAt:at, decidedBy:"owner"});
+    await db.collection("events").add({type:"decision", from:"owner", text:(status==="approved"?"Approved: ":"Declined: ")+(n.title||n.id)+(answer?" — “"+answer+"”":""), at, need:n.id});
+  } catch(e){
+    btns.forEach(b=>b.disabled=false);
+    showBanner(e && e.code==="invalid_argument" ? "Only the owner can decide here. This view is read-only." : "That decision didn't save. Check your connection and try again.");
+  }
+}
+function showBanner(t){ const b=$("banner"); b.textContent=t; b.hidden=false; }
+function setConn(s,t){ const c=$("conn"); c.dataset.s=s; $("connText").textContent=t; }
+
+function snapToList(snap){ return snap.docs.map(d => ({id:d.id, ...d.data()})); }
+
+(async function start(){
+  renderPipe();
+  db = await claude.use("db");
+  if (!db){ setConn("off","Offline"); showBanner("The board's data can't load in this view. Open it on claude.ai while signed in."); ["needs","team"].forEach(id=>$(id).replaceChildren(el("p","empty","Not available in this view."))); return; }
+  const user = await claude.use("user");
+  if (user){ const isOwner = user.isOwner(); const cw = user.can ? user.can("data.write") : null; canWrite = isOwner || user.canEdit() || cw === true || cw === null; }
+  let confirmed = false;
+  const timer = setTimeout(()=>{ if(!confirmed){ setConn("slow","Can't reach the board yet"); } }, 10000);
+  const ok = snap => { if (!snap.metadata.fromCache && !confirmed){ confirmed = true; clearTimeout(timer); setConn("live","Live"); } };
+  const fail = e => { clearTimeout(timer); setConn("off","Disconnected"); showBanner("The board stopped updating ("+(e&&e.code||"error")+"). Reload the page to reconnect."); };
+  db.collection("staff").onSnapshot(s=>{ ok(s); state.staff = snapToList(s); state.staff.forEach(x=>state.names[x.id]=x.name||x.id); renderTeam(); renderPipe(); renderNeeds(); renderLog(); }, fail);
+  db.collection("tasks").limit(300).onSnapshot(s=>{ ok(s); state.tasks = snapToList(s); renderPipe(); }, fail);
+  db.collection("needs").orderBy("created","desc").limit(60).onSnapshot(s=>{ ok(s); state.needs = snapToList(s); renderNeeds(); }, fail);
+  db.collection("events").orderBy("at","desc").limit(40).onSnapshot(s=>{ ok(s); state.events = snapToList(s); renderLog(); }, fail);
+})();
+</script>
